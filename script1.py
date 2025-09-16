@@ -56,7 +56,7 @@ def search_users():
                 "registrationId": user.get("registrationId"),
                 "photo": convert_photo_url(user.get("photo")),
                 "ID": user.get("ukid"),
-                "userRole": user.get("userType"),
+                "userType": user.get("userType"),
             })
 
         return jsonify(filtered_users)
