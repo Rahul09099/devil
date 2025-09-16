@@ -1,12 +1,16 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 import requests
+import os
+from dotenv import load_dotenv
+
+load_dotenv()  # Load .env file
 
 app = Flask(__name__)
-CORS(app)  # Allow requests from any origin (you can restrict if needed)
+CORS(app)  # Allow requests from frontend
 
-# ✅ Hardcoded Auth-Token
-AUTH_TOKEN = "eyJlbmMiOiJBMjU2R0NNIiwiYWxnIjoiZGlyIn0..jro4z6L_kDP5d14E.C86_tpwwmv_S8AQC_kp9-Y5uWrH4ewy4MZbxEunW10wiGSba11RRg5ZzyLY6EkRbUsTAcTrHJWWyQgVtZ8YqL9zsQJ6v8WulLUX6CCjZc0s82QA0siNF9r_ZtZQb32idienDgQlVS1pAyGEz_T2hhi1-mc619XbVkm-KifjeDyufUKP_Z601MChdEY52C9iWuHyiBBvb08SL4F5Wme826HcvKWgjFfduVZiFoS6xnpW-2XGz4FL3KJd8vRbiqhya7ENen1fdxSfvatJWqD91E6FonXL-zuiAU2jZQAvgm6hu70gFxNW1OplzgTSUCyp0wXwftXjVZlHMNYiqFysbDvq9bNSAQoq0UI15RX1w6mOaR4aD6FuZy8Gxlx9rhxK_fXl5A8PLoXZPWBXD3aaPjunfVhTIidZ10JA1NzPal3ReWf2pCyGNfQuRPk_-bx90JcT8GQEUYYLdNMHTqhWsCldl7Uo3CazS_4qvshMUJojrjG_d1XD092Y8laVlG0W-hhbgp88uIxg4LNnI_Mq1xnp8H3XTa4ijYOT8AjoH7CXiF5-UdOt43Yqex-l9.IeVTf1gsGjA-s0mfj3wLBA"
+# ✅ Read Auth-Token from environment
+AUTH_TOKEN = os.getenv("AUTH_TOKEN")
 USER_SEARCH_URL = "https://sitareuniv.digiicampus.com/rest/users/search/all"
 
 @app.route('/search_users', methods=['GET'])
