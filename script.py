@@ -13,9 +13,26 @@ CORS(app)  # Allow requests from frontend
 AUTH_TOKEN = os.getenv("AUTH_TOKEN")
 USER_SEARCH_URL = "https://sitareuniv.digiicampus.com/rest/users/search/all"
 
+# ✅ CloudFront base URL to make relative photo paths clickable
+CLOUD_FRONT_BASE = "https://dli6r6oycdqaz.cloudfront.net/"
+# ✅ Optional default profile image
+DEFAULT_PROFILE_IMG = "https://d1reij146f0v46.cloudfront.net/version-1757958587/images/profile.png"
+
+def convert_photo_url(photo):
+    """Convert internal photo path to full CloudFront URL, or return default if None."""
+    if not photo:
+        return DEFAULT_PROFILE_IMG
+    # Remove any extra prefixes like "testattachments.collpoll##"
+    if "##" in photo:
+        photo = photo.split("##", 1)[1]  # take part after ##
+    # Prepend CloudFront base if not already full URL
+    if not photo.startswith("http://") and not photo.startswith("https://"):
+        photo = CLOUD_FRONT_BASE + photo
+    return photo
+
 @app.route('/search_users', methods=['GET'])
 def search_users():
-    key = request.args.get('key', '')
+    key = request.args.get('key', '').strip()
 
     if not key:
         return jsonify({"error": "Missing search key"}), 400
@@ -37,9 +54,9 @@ def search_users():
                 "name": user.get("name"),
                 "email": user.get("email"),
                 "registrationId": user.get("registrationId"),
-                "photo": user.get("photo"),
-                "ukid": user.get("ukid"),
-                "userType": user.get("userType"),
+                "photo": convert_photo_url(user.get("photo")),
+                "ID": user.get("ukid"),
+                "userRole": user.get("userType"),
             })
 
         return jsonify(filtered_users)
