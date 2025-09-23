@@ -65,9 +65,9 @@ def search_users():
         # return users
 
     except requests.exceptions.RequestException as e:
-        return jsonify({"error": str(e)}), 500
+        return "Unauthorise_acess"
     except ValueError:
-        return jsonify({"error": "Invalid JSON response"}), 500
+        return "Uauthorise acess"
 
 if __name__ == '__main__':
     app.run(debug=True)
