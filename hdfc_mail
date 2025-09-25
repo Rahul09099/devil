@@ -1,0 +1,84 @@
+import requests
+import json
+import os
+
+
+lst=[]
+for i in range(1,160):
+    if i<10:
+        email=f"su-2400{i}@sitare.org"
+    elif i<99:
+        email=f"su-240{i}@sitare.org"
+    else:
+        email=f"su-24{i}@sitare.org"
+    lst.append(email)
+
+print(lst)
+
+
+
+
+# API endpoint
+RESULT_URL = "https://api.buddy4study.com/api/v1.0/ssms/scholarship/hdfc-bank-parivartan-s-ecss-programme-for-undergraduate-courses-merit-cum-need-based-2024-25/result/filter"
+
+# 🔑 Paste a fresh access token here (must be valid, not expired)
+ACCESS_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWFkIiwid3JpdGUiLCJ0cnVzdCJdLCJleHAiOjE3OTAxNTcyMjgsImF1dGhvcml0aWVzIjpbIlVTRVIiXSwianRpIjoiMzc0NTE5NTUtYTA5OS00YmYyLWI5ZTUtZjZhMzA1MTY5NDNhIiwiY2xpZW50X2lkIjoiYjRzIn0.OOG_mWnUYvWQYbBKeMf993qYxCK_vNvXqzR1y9342iI"
+
+OUTPUT_FILE = "hdfc_results.json"
+
+def get_result(application_number="", email="", mobile=""):
+    headers = {
+        "Authorization": f"Bearer {ACCESS_TOKEN}",
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+    }
+
+    payload = {
+        "applicationNumber": application_number,
+        "email": email,
+        "mobile": mobile,
+    }
+
+    response = requests.post(RESULT_URL, headers=headers, json=payload)
+    if response.status_code == 401:
+        print("❌ Unauthorized (token likely expired). Get a new access_token.")
+        return None
+
+    response.raise_for_status()
+    return response.json()
+
+def save_result(data):
+    # Skip saving if empty response
+    if data == {
+        "title": None,
+        "publishDate": None,
+        "count": 0,
+        "logoFid": None,
+        "awardees": []
+    }:
+        print("⏭️ Skipped empty result")
+        return
+
+    # Load existing file
+    if os.path.exists(OUTPUT_FILE):
+        with open(OUTPUT_FILE, "r", encoding="utf-8") as f:
+            all_data = json.load(f)
+    else:
+        all_data = []
+
+    # Append new data
+    all_data.append(data)
+
+    # Save back
+    with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
+        json.dump(all_data, f, indent=2, ensure_ascii=False)
+
+    print("💾 Saved result")
+
+if __name__ == "__main__":
+    for i in lst:
+        email = i
+        result = get_result(email=email)
+        if result:
+            print(json.dumps(result, indent=2))
+            save_result(result)
